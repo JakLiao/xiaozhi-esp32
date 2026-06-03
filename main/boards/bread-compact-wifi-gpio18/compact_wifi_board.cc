@@ -8,6 +8,7 @@
 #include "mcp_server.h"
 #include "lamp_controller.h"
 #include "led/single_led.h"
+#include "servo_controller.h"
 #include "assets/lang_config.h"
 
 #include <esp_log.h>
@@ -150,6 +151,7 @@ private:
     // 物联网初始化，逐步迁移到 MCP 协议
     void InitializeTools() {
         static LampController lamp(LAMP_GPIO);
+        InitializeServoController();  // 2 自由度云台（PCA9685 @ I2C1: SDA=GPIO9, SCL=GPIO10; X=CH0, Y=CH1）
     }
 
 public:
