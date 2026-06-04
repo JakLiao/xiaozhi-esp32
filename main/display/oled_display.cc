@@ -186,8 +186,9 @@ void OledDisplay::SetupUI_128x64() {
     lv_obj_set_style_pad_row(container_, 0, 0);
 
     /* Layer 1: Top bar - for status icons */
+    // v2.3: 16→12，给 content_ 多 4px 高度，让 WRAP 模式 3 行能装下
     top_bar_ = lv_obj_create(container_);
-    lv_obj_set_size(top_bar_, LV_HOR_RES, 16);
+    lv_obj_set_size(top_bar_, LV_HOR_RES, 12);
     lv_obj_set_style_radius(top_bar_, 0, 0);
     lv_obj_set_style_bg_opa(top_bar_, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(top_bar_, 0, 0);
@@ -271,18 +272,14 @@ void OledDisplay::SetupUI_128x64() {
 
     chat_message_label_ = lv_label_create(content_right_);
     lv_label_set_text(chat_message_label_, "");
-    lv_label_set_long_mode(chat_message_label_, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    // v2.2 fix: 不再循环滚动（之前 SCROLL_CIRCULAR + ANIM_REPEAT_INFINITE 导致
+    // "最后答复的一段话" 视觉上无限循环，用户误以为 AI 在重复播放同一段话）。
+    // 改为 WRAP：长文本自动换行显示，AI 说完一句话后消息静止，不会再有"循环错觉"。
+    lv_label_set_long_mode(chat_message_label_, LV_LABEL_LONG_WRAP);
     lv_obj_set_style_text_align(chat_message_label_, LV_TEXT_ALIGN_LEFT, 0);
     lv_obj_set_width(chat_message_label_, width_ - 32);
-    lv_obj_set_style_pad_top(chat_message_label_, 14, 0);
-
-    // Start scrolling subtitle after a delay
-    static lv_anim_t a;
-    lv_anim_init(&a);
-    lv_anim_set_delay(&a, 1000);
-    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    lv_obj_set_style_anim(chat_message_label_, &a, LV_PART_MAIN);
-    lv_obj_set_style_anim_duration(chat_message_label_, lv_anim_speed_clamped(60, 300, 60000), LV_PART_MAIN);
+    // v2.3: 14→0，配合 top_bar_ 16→12，content_ 高度 48→52，3 行不裁
+    lv_obj_set_style_pad_top(chat_message_label_, 0, 0);
 
     low_battery_popup_ = lv_obj_create(screen);
     lv_obj_set_scrollbar_mode(low_battery_popup_, LV_SCROLLBAR_MODE_OFF);
@@ -372,16 +369,9 @@ void OledDisplay::SetupUI_128x32() {
     chat_message_label_ = lv_label_create(side_bar_);
     lv_obj_set_size(chat_message_label_, width_ - 32, LV_SIZE_CONTENT);
     lv_obj_set_style_pad_left(chat_message_label_, 2, 0);
-    lv_label_set_long_mode(chat_message_label_, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    // v2.2 fix: 同样去掉循环滚动 + 无限循环动画，避免"最后一段话"视觉循环的错觉
+    lv_label_set_long_mode(chat_message_label_, LV_LABEL_LONG_WRAP);
     lv_label_set_text(chat_message_label_, "");
-
-    // Start scrolling subtitle after a delay
-    static lv_anim_t a;
-    lv_anim_init(&a);
-    lv_anim_set_delay(&a, 1000);
-    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    lv_obj_set_style_anim(chat_message_label_, &a, LV_PART_MAIN);
-    lv_obj_set_style_anim_duration(chat_message_label_, lv_anim_speed_clamped(60, 300, 60000), LV_PART_MAIN);
 }
 
 void OledDisplay::SetEmotion(const char* emotion) {
