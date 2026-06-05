@@ -50,13 +50,16 @@
 #define SERVO_PCA9685_CH_X    0
 #define SERVO_PCA9685_CH_Y    1
 
-// 角度中心点与限位
+// 角度中心点与限位（v2.4 激进版：放宽到 SG90 物理安全极限 ±70°/±45°）
+// 旧值：X 30-150（±60°），Y 60-120（±30°）
+// 新值：X 20-160（±70°），Y 45-135（±45°）
+// 注意：激进版需要主人验证机械结构不会撞
 #define SERVO_X_CENTER        90
-#define SERVO_X_MIN           30
-#define SERVO_X_MAX           150
+#define SERVO_X_MIN           20
+#define SERVO_X_MAX           160
 #define SERVO_Y_CENTER        90
-#define SERVO_Y_MIN           60
-#define SERVO_Y_MAX           120
+#define SERVO_Y_MIN           45
+#define SERVO_Y_MAX           135
 
 // 步进插值默认参数（desk-emoji 同款）
 #define SERVO_STEP_DEG        1         // 每步 1°
